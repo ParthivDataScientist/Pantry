@@ -2,17 +2,19 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pantry Selection</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap');
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+                Roboto, Helvetica, Arial, sans-serif;
             background-color: #F2F2F7;
-            /* iOS Light Gray */
             -webkit-font-smoothing: antialiased;
         }
 
@@ -31,7 +33,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
         }
 
-        /* Card Animations */
+        /* Card animation */
         @keyframes fadeUp {
             from {
                 opacity: 0;
@@ -59,7 +61,7 @@
             transform: scale(0.98);
         }
 
-        /* Modal Animation */
+        /* Modal animation */
         .modal-enter {
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -76,6 +78,7 @@
             }
         }
 
+        /* Check animation */
         .check-anim path {
             stroke-dasharray: 100;
             stroke-dashoffset: 100;
@@ -87,60 +90,97 @@
                 stroke-dashoffset: 0;
             }
         }
+
+        /* Cart slide up */
+        #cart-bar {
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
     </style>
 </head>
 
-<body class="pb-32">
+<body class="pb-40">
 
     <!-- Navigation -->
-    <header class="glass-nav fixed top-0 w-full z-50 transition-all duration-300">
+    <header class="glass-nav fixed top-0 w-full z-50">
         <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-sm">P
+                <div
+                    class="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                    P
                 </div>
-                <h1 class="text-lg font-semibold tracking-tight text-gray-900">Pantry</h1>
+                <h1 class="text-lg font-semibold tracking-tight text-gray-900">
+                    Pantry
+                </h1>
             </div>
 
             <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-500 hidden sm:block">Employee Access</span>
+                <span class="text-sm text-gray-500 hidden sm:block">
+                    Employee Access
+                </span>
                 <button id="logoutBtn"
-                    class="text-sm font-medium text-red-500 hover:text-red-600 transition bg-red-50 px-3 py-1.5 rounded-full">Sign
-                    Out</button>
+                    class="text-sm font-medium text-red-500 hover:text-red-600 transition bg-red-50 px-3 py-1.5 rounded-full">
+                    Sign Out
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Hero / Title -->
+    <!-- Main -->
     <main class="max-w-5xl mx-auto px-6 pt-28">
-        <div class="mb-10 animate-[fadeUp_0.6s_ease-out]">
-            <h2 class="text-4xl font-bold text-gray-900 tracking-tight mb-2">Today's Selection</h2>
-            <p class="text-gray-500 text-lg">Fresh snacks and drinks, on the house.</p>
+        <div class="mb-10">
+            <h2 class="text-4xl font-bold text-gray-900 tracking-tight mb-2">
+                Today's Selection
+            </h2>
+            <p class="text-gray-500 text-lg">
+                Fresh snacks and drinks, on the house.
+            </p>
         </div>
 
-        <!-- Grid -->
-        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Products -->
+        <div id="product-grid"
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <!-- Cards injected via JS -->
         </div>
     </main>
 
     <!-- Floating Cart -->
-    <!-- Fixed sizing and spacing here -->
     <div id="cart-bar"
-        class="fixed bottom-8 left-1/2 transform -translate-x-1/2 w-[95%] max-w-3xl z-50 hidden transition-all duration-300">
+        class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] max-w-3xl z-50 hidden">
+
         <div
-            class="glass-cart rounded-3xl p-3 pl-6 pr-3 flex items-center justify-between text-white border border-white/10 shadow-2xl">
-            <div class="flex items-center space-x-4">
-                <div class="bg-blue-500 w-10 h-10 rounded-full flex items-center justify-center font-bold text-base shadow-lg shadow-blue-500/40"
-                    id="cart-count">0</div>
-                <span class="font-medium text-lg text-gray-100 tracking-wide">Items selected</span>
+            class="glass-cart rounded-3xl px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-5 text-white border border-white/10 shadow-2xl">
+
+            <!-- Item Count -->
+            <div class="flex items-center gap-4">
+                <div id="cart-count"
+                    class="bg-blue-500 w-11 h-11 rounded-full flex items-center justify-center font-bold text-lg shadow-lg shadow-blue-500/40">
+                    0
+                </div>
+                <span class="font-medium text-lg text-gray-100 tracking-wide">
+                    Items selected
+                </span>
             </div>
 
-            <div class="flex items-center gap-4">
-                <input type="text" id="order-notes" placeholder="Add notes (e.g. 'No sugar')..."
-                    class="bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:bg-white/20 transition-all w-64 hidden md:block">
+            <!-- Notes + Button -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                <input type="text" id="order-notes"
+                    placeholder="Add notes (e.g. 'No sugar')..."
+                    class="bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:bg-white/20 transition-all w-full sm:w-64">
 
                 <button id="placeOrderBtn"
-                    class="bg-white text-black px-8 py-3 rounded-2xl font-bold text-lg hover:bg-gray-100 transition active:scale-95 shadow-lg">
+                    class="bg-white text-black px-6 py-3 rounded-2xl font-bold text-lg hover:bg-gray-100 transition active:scale-95 shadow-lg w-full sm:w-auto">
                     Place Order
                 </button>
             </div>
@@ -153,13 +193,19 @@
         <div
             class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-all duration-300 flex flex-col items-center modal-content">
             <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <svg class="w-10 h-10 text-green-600 check-anim" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                <svg class="w-10 h-10 text-green-600 check-anim" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24"
                     stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h3>
-            <p class="text-gray-500 text-center mb-8">Your items will be ready at the counter shortly.</p>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">
+                Order Confirmed!
+            </h3>
+            <p class="text-gray-500 text-center mb-8">
+                Your items will be ready at the counter shortly.
+            </p>
             <button onclick="closeModal()"
                 class="w-full bg-gray-900 text-white font-semibold py-4 rounded-xl hover:bg-black transition">
                 Done
