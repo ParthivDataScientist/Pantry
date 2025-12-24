@@ -1,0 +1,15 @@
+---
+description: This is a webapplication build on backend Flask and frontend using simple but best UI. It is a simple pantry managing application. It workaround is login page (employee and pantry emplyee), a Menu page where employee order, order will seen on pantry 
+---
+
+🏗️ Project ArchitectureBackend: FastAPI (recommended for its speed and built-in docs) or Flask.Database: SQLite (SQLAlchemy ORM).Frontend: HTML5, Tailwind CSS, JavaScript (Fetch API).
+
+ 1. Database Schema (SQLite)The agent should initialize a database with the following tables:User Table: id, username, password (hashed), role (e.g., 'pantry' or 'employee').Product Table: id, name, price, image_url.Order Table: id, employee_id, items (JSON or String), status (Pending/Done), timestamp.🔑 
+
+2. Authentication & Role LogicRequirement: Role-based landing without a dropdown selector.Logic: Upon login, the backend checks the role associated with the username in the database.Redirects:If role == 'pantry', redirect to /pantry.If role == 'employee', redirect to /order.Agent Task: Create a POST /login endpoint that returns a JWT or Session cookie and the redirect URL.
+
+ 3. Frontend SpecificationsA. Login Page (/)Title: "Insta-Pantry" (Centered, Bold).UI: Clean card layout using Tailwind. Username and Password fields.Action: Submit to /login.B. Order Page (/order)Menu Grid: Display items in a square grid (grid-cols-2 or grid-cols-3).Interactive Counter: * Initial State: "Add" button.Active State: When clicked, "Add" disappears, replaced by [-] 1 [+].Cart Component: 
+A sticky sidebar or bottom bar showing:Summary of selected items.Total count.Order Button: On click, sends a JSON payload: { "employee": "username", "items": [...], "total": 123 }.
+C. Pantry Page (/pantry)UI: A "Kitchen Display System" (KDS) layout.Order Cards: White cards on a light gray background containing:Employee Name.List of Items & Quantities.Time elapsed since order.Action: A "Done" button on each card that sends a PATCH request to update the order status to "Completed," triggering the card to slide out or disappear.⚙️ 
+
+4. Backend API EndpointsMethodEndpointDescriptionPOST/api/loginAuthenticates user and returns role-based redirect.GET/api/productsReturns list of food/water items for the Order Page.POST/api/orderSaves a new order from an employee to the database.GET/api/pantry/ordersFetches all "Pending" orders for the Pantry view.PATCH/api/order/{id}/doneMarks an order as complete (removes it from view).🚀 5. Execution Steps for the AgentEnvironment Setup: Create a Python virtual environment and install fastapi, uvicorn, sqlalchemy.Database Script: Create models.py and a seed script to add one "pantry" user and several "employee" users.Static Assets: Set up a folder for images (Water, Food) and the Tailwind CDN link in the HTML headers.State Management (JS): Write a simple JavaScript script for the Order Page to handle the "Add to Cart" logic and quantity toggles without refreshing the page.Polling: Set the Pantry Page to refresh every 10 seconds (or use WebSockets) to check for new orders.

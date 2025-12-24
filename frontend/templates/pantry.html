@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insta-Pantry - Kitchen Display</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .card-enter {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-800 text-white min-h-screen p-6">
+    <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
+        <h1 class="text-3xl font-bold text-yellow-500">KITCHEN DISPLAY</h1>
+        <div class="flex items-center gap-4">
+            <button id="sound-toggle" onclick="playBellSound()"
+                class="bg-red-500 hover:opacity-80 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all">
+                🔕 Sound Off (Click to Enable)
+            </button>
+            <div class="test-sm text-gray-400 font-mono" id="clock">00:00:00</div>
+        </div>
+    </header>
+
+    <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Orders injected here -->
+    </div>
+
+    <script src="/static/js/pantry.js"></script>
+</body>
+
+</html>
