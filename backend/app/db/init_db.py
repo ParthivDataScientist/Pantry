@@ -34,13 +34,25 @@ def init_db(db: Session):
 
     # Check if products exist
     products = [
-        {"name": "Water Bottle", "price": 0.0, "image_url": "https://placehold.co/200x200/e0f2fe/0ea5e9?text=Water"},
-        {"name": "Sandwich", "price": 0.0, "image_url": "https://placehold.co/200x200/fef3c7/d97706?text=Sandwich"},
-        {"name": "Chips", "price": 0.0, "image_url": "https://placehold.co/200x200/fee2e2/dc2626?text=Chips"},
-        {"name": "Cola", "price": 0.0, "image_url": "https://placehold.co/200x200/3c3c3c/ffffff?text=Cola"},
-        {"name": "Tea", "price": 0.0, "image_url": "https://placehold.co/200x200/3c3c3c/ffffff?text=Tea"},
-        {"name": "Coffee", "price": 0.0, "image_url": "https://placehold.co/200x200/3c3c3c/ffffff?text=Coffee"},
-        {"name": "Milk", "price": 0.0, "image_url": "https://placehold.co/200x200/3c3c3c/ffffff?text=Milk"}
+        {"name": "Water bottle", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Water+Bottle"},
+        {"name": "Glass of water", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Glass+of+water"},
+        {"name": "Tea", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Tea"},
+        {"name": "Coffee", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Coffee"},
+        {"name": "Black tea", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Black+tea"},
+        {"name": "Coffee without Sugar", "price": 0.0, "image_url": "https://placehold.co/200x200?text=No+Sugar+Coffee"},
+        {"name": "Cold drink", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Cold+drink"},
+        {"name": "Small plate", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Small+plate"},
+        {"name": "Big plate", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Big+plate"},
+        {"name": "Small bowl", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Small+bowl"},
+        {"name": "Spoon", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Spoon"},
+        {"name": "Fork", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Fork"},
+        {"name": "Salt", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Salt"},
+        {"name": "Sugar", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Sugar"},
+        {"name": "Lunch", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Lunch"},
+        {"name": "Vada pav", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Vada+pav"},
+        {"name": "Samosa", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Samosa"},
+        {"name": "Breakfast", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Breakfast"},
+        {"name": "Other", "price": 0.0, "image_url": "https://placehold.co/200x200?text=Other"},
     ]
     
     for prod_data in products:
