@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 import json
+from pywebpush import webpush, WebPushException
+
 
 from backend.app.db.session import get_db
 from backend.app.core.security import verify_password, create_access_token
@@ -13,6 +15,7 @@ from backend.app.schemas.user import UserLogin, Token, UserCreate
 from backend.app.schemas.product import Product
 from backend.app.schemas.order import OrderCreate, Order
 from backend.app.api.deps import get_current_user
+
 
 router = APIRouter()
 
@@ -89,6 +92,10 @@ def create_order(order_in: OrderCreate, db: Session = Depends(get_db), current_u
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
+    
+    # Notify pantry managers
+    notify_pantry_manager(db, db_order)
+    
     return db_order
 
 @router.get("/pantry/orders", response_model=List[Order])
@@ -110,3 +117,72 @@ def mark_order_done(order_id: int, db: Session = Depends(get_db), current_user: 
     order.status = "Completed"
     db.commit()
     return {"message": "Order completed"}
+
+
+from pydantic import BaseModel, HttpUrl
+
+class PushSubscriptionSchema(BaseModel):
+    endpoint: HttpUrl
+    keys: dict
+
+@router.post("/subscribe")
+def subscribe(subscription: PushSubscriptionSchema, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Save subscription for the current user
+    from backend.app.models.push_subscription import PushSubscription
+    
+    # Check if exists
+    existing = db.query(PushSubscription).filter(PushSubscription.endpoint == str(subscription.endpoint)).first()
+    if existing:
+        return {"message": "Already subscribed"}
+        
+    new_sub = PushSubscription(
+        user_id=current_user.id,
+        endpoint=str(subscription.endpoint),
+        p256dh=subscription.keys['p256dh'],
+        auth=subscription.keys['auth']
+    )
+    db.add(new_sub)
+    db.commit()
+    return {"message": "Subscribed successfully"}
+
+def notify_pantry_manager(db: Session, order_details: OrderModel):
+    from backend.app.core.config import settings
+    from backend.app.models.push_subscription import PushSubscription
+    
+    try:
+        from pywebpush import webpush, WebPushException
+    except ImportError:
+        print("pywebpush not installed. Skipping notification.")
+        return
+
+    # Get all pantry managers
+    pantry_users = db.query(User).filter(User.role == "pantry").all()
+    
+    for user in pantry_users:
+        for sub in user.push_subscriptions:
+            try:
+                webpush(
+                    subscription_info={
+                        "endpoint": sub.endpoint,
+                        "keys": {
+                            "p256dh": sub.p256dh,
+                            "auth": sub.auth
+                        }
+                    },
+                    data=json.dumps({
+                        "title": "New Order!",
+                        "body": f"Order #{order_details.id} from {order_details.employee_id}",
+                        "url": "/pantry"
+                    }),
+                    vapid_private_key=settings.VAPID_PRIVATE_KEY,
+                    vapid_claims={"sub": settings.VAPID_CLAIMS_EMAIL}
+                )
+            except WebPushException as ex:
+                if ex.response and ex.response.status_code == 410:
+                    # Subscription expired
+                    db.delete(sub)
+                    db.commit()
+                print("Push failed", ex)
+            except Exception as e:
+                print(f"Error sending push: {e}")
+

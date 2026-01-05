@@ -47,7 +47,16 @@
         <!-- Orders injected here -->
     </div>
 
+    <!-- Push Notification Subscription Button -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button onclick="subscribeToPush()"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+            🔔 Enable Notifications
+        </button>
+    </div>
+
     <script src="/static/js/pantry.js"></script>
+    <script src="/static/js/push_client.js"></script>
 </body>
 
 </html>
