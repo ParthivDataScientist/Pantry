@@ -41,6 +41,11 @@ async def read_order(request: Request):
 async def read_pantry(request: Request):
     return templates.TemplateResponse("pantry.html", {"request": request})
 
+from fastapi.responses import FileResponse
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse(os.path.join(BASE_DIR, "sw.js"), media_type="application/javascript")
+
 @app.on_event("startup")
 def on_startup():
     # Initialize DB
