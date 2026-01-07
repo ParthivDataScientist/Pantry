@@ -30,7 +30,7 @@ async function subscribeToPush() {
         // I'll put a placeholder string that is obviously needing replacement, or a valid looking test key?
         // No, invalid key will cause subscription failure.
         // I will add a method to fetch the public key from server maybe? No, keep it simple.
-        const publicVapidKey = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'; // Example Key
+        const publicVapidKey = 'BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20';
 
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,

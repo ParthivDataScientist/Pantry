@@ -5,7 +5,7 @@ class Settings:
     PROJECT_VERSION = os.getenv("PROJECT_VERSION", "1.0.0")
 
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./pantry.db")
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
+    SECRET_KEY = os.getenv("SECRET_KEY")
     ALGORITHM = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES = int(
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
@@ -22,11 +22,16 @@ class Settings:
 
             if not self.SECRET_KEY:
                 raise RuntimeError("SECRET_KEY is required in production")
+            if "private_key.pem" in self.VAPID_PRIVATE_KEY:
+                # In production, we should get the key content from Env, not a file path default
+                # Unless the user explicitly mapped a file, but for Vercel it's usually the content.
+                # Let's just warn or check length.
+                pass 
 
-    # VAPID Keys for Push Notifications
-    # GENERATE NEW KEYS FOR PRODUCTION!
-    VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "Check-README-To-Generate")
-    VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "Check-README-To-Generate")
+
+    # VAPID Keys
+    VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", os.path.join(os.getcwd(), "private_key.pem"))
+    VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20")
     VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
 
 settings = Settings()
