@@ -1,5 +1,6 @@
 
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from backend.app.db.session import Base
 
 class User(Base):
@@ -9,3 +10,5 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password_hash = Column(String)
     role = Column(String) # 'pantry' or 'employee'
+    
+    push_subscriptions = relationship("backend.app.models.push_subscription.PushSubscription", back_populates="owner", cascade="all, delete-orphan")

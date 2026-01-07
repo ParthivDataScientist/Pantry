@@ -4,6 +4,7 @@ from backend.app.db.session import engine, SessionLocal
 from backend.app.db.base import Base # Import base to access metadata
 from backend.app.models.user import User
 from backend.app.models.product import Product
+from backend.app.models.push_subscription import PushSubscription
 from backend.app.core.security import get_password_hash
 
 def init_db(db: Session):
