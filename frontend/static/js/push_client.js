@@ -59,7 +59,7 @@ async function subscribeToPush() {
 
 // Register SW
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/js/sw.js')
+    navigator.serviceWorker.register('/sw.js')
         .then(function (registration) {
             console.log('Service Worker Registered');
         });
