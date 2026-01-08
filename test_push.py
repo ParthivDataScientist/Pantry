@@ -27,9 +27,9 @@ for sub in subs:
             vapid_private_key=settings.VAPID_PRIVATE_KEY,
             vapid_claims={"sub": settings.VAPID_CLAIMS_EMAIL}
         )
-        print("✅ Success!")
+        print("Success!")
     except WebPushException as ex:
-        print(f"❌ Failed: {ex}")
+        print(f"Failed: {ex}")
         if ex.response:
              print(f"Response: {ex.response.text}")
 

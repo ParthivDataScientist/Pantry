@@ -4,28 +4,32 @@ class Settings:
     PROJECT_NAME = os.getenv("PROJECT_NAME", "Insta-Pantry")
     PROJECT_VERSION = os.getenv("PROJECT_VERSION", "1.0.0")
 
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./pantry.db")
-    SECRET_KEY = os.getenv("SECRET_KEY",'')
+    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_b5nFf6GNiTvJ@ep-cool-smoke-advsyud7-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require")
+    SECRET_KEY = os.getenv("SECRET_KEY",'parthiv283')
     ALGORITHM = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES = int(
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
     )
 
     def __init__(self):
-        env = os.getenv("VERCEL_ENV") or os.getenv("ENV", "local")
+        self.ENV = os.getenv("VERCEL_ENV") or os.getenv("ENV", "local")
+        
+        # Determine Database URL
+        if self.ENV == "local":
+            # Use SQLite for local development to avoid conflicts with Start fresh
+            self.DATABASE_URL = "sqlite:///./pantry.db"
+        else:
+            # Use Production DB
+            self.DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_b5nFf6GNiTvJ@ep-cool-smoke-advsyud7-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require")
 
-        if env != "local":
+        if self.ENV != "local":
             if not self.DATABASE_URL:
                 raise RuntimeError("DATABASE_URL is required in production")
             if not self.SECRET_KEY:
                 raise RuntimeError("SECRET_KEY is required in production")
-
-            if not self.SECRET_KEY:
-                raise RuntimeError("SECRET_KEY is required in production")
+            
+            # VAPID key handling for production
             if "private_key.pem" in self.VAPID_PRIVATE_KEY:
-                # In production, we should get the key content from Env, not a file path default
-                # Unless the user explicitly mapped a file, but for Vercel it's usually the content.
-                # Let's just warn or check length.
                 pass 
 
 
