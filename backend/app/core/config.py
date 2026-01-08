@@ -27,6 +27,15 @@ class Settings:
             self.VAPID_PRIVATE_KEY = os.path.join(os.getcwd(), "private_key.pem")
             
         self.VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20")
+        
+        # Sanitize PEM format if present (remove headers/footers/newlines)
+        if "-----BEGIN PUBLIC KEY-----" in self.VAPID_PUBLIC_KEY:
+            self.VAPID_PUBLIC_KEY = self.VAPID_PUBLIC_KEY.replace("-----BEGIN PUBLIC KEY-----", "")\
+                                                         .replace("-----END PUBLIC KEY-----", "")\
+                                                         .replace("\n", "")\
+                                                         .replace("\r", "")\
+                                                         .strip()
+
         self.VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
 
         # 3. Validation
@@ -43,3 +52,4 @@ class Settings:
                 pass
 
 settings = Settings()
+
