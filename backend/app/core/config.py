@@ -31,7 +31,7 @@ class Settings:
 
     # VAPID Keys
     VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", os.path.join(os.getcwd(), "private_key.pem"))
-    VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20")
+    VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BC6WcAbTYUzXRgEPxN_rHTsCfYKk-BUk0yVao2czbAp39_K58ftCvpHq_0iPlXqvXegCZBVyYo-uf7xBE4JT1NE")
     VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
 
 settings = Settings()
