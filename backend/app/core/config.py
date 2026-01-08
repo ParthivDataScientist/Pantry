@@ -35,6 +35,31 @@ class Settings:
                                                          .replace("\n", "")\
                                                          .replace("\r", "")\
                                                          .strip()
+        
+        # Check if the key is ASN.1 encoded (starts with headers) or just raw
+        # Attempt to decode to bytes to check length
+        try:
+            import base64
+            # Add padding if needed
+            pad = len(self.VAPID_PUBLIC_KEY) % 4
+            if pad > 0:
+                self.VAPID_PUBLIC_KEY += "=" * (4 - pad)
+                
+            key_bytes = base64.b64decode(self.VAPID_PUBLIC_KEY)
+            
+            # P-256 key is 65 bytes (0x04 + 32X + 32Y)
+            # ASN.1 SubjectPublicKeyInfo for P-256 is usually 91 bytes
+            if len(key_bytes) > 65:
+                # Find the 0x04 65-byte sequence
+                # It is usually at the end. 
+                # Header usually ends with 0x03 0x42 0x00
+                if b'\x03\x42\x00\x04' in key_bytes:
+                    idx = key_bytes.find(b'\x03\x42\x00')
+                    raw_key = key_bytes[idx+3:]
+                    # Re-encode to URL-safe base64 for frontend
+                    self.VAPID_PUBLIC_KEY = base64.urlsafe_b64encode(raw_key).decode().strip("=")
+        except Exception:
+            pass # Keep original if fails
 
         self.VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
 
