@@ -145,6 +145,11 @@ def subscribe(subscription: PushSubscriptionSchema, db: Session = Depends(get_db
     db.commit()
     return {"message": "Subscribed successfully"}
 
+@router.get("/vapid-public-key")
+def get_vapid_public_key():
+    from backend.app.core.config import settings
+    return {"public_key": settings.VAPID_PUBLIC_KEY}
+
 def notify_pantry_manager(db: Session, order_details: OrderModel):
     from backend.app.core.config import settings
     from backend.app.models.push_subscription import PushSubscription
