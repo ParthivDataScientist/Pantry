@@ -23,14 +23,10 @@ async function subscribeToPush() {
     try {
         const registration = await navigator.serviceWorker.ready;
 
-        // Hardcoded public key - MUST MATCH BACKEND
-        // Since I put "Check-README-To-Generate" in backend, this will fail if not updated.
-        // But for the user to learn, I will prompt them or put a placeholder.
-        // I will assume the user puts the key here.
-        // I'll put a placeholder string that is obviously needing replacement, or a valid looking test key?
-        // No, invalid key will cause subscription failure.
-        // I will add a method to fetch the public key from server maybe? No, keep it simple.
-        const publicVapidKey = 'BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20';
+        // Fetch public key from server
+        const response = await fetch('/api/vapid-public-key');
+        const data = await response.json();
+        const publicVapidKey = data.public_key;
 
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,

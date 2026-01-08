@@ -33,9 +33,11 @@ class Settings:
                 pass 
 
 
-    # VAPID Keys
-    VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", os.path.join(os.getcwd(), "private_key.pem"))
-    VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20")
-    VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
+        self.VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY") 
+        if not self.VAPID_PRIVATE_KEY:
+            # Fallback to local file only if ENV is local
+            self.VAPID_PRIVATE_KEY = os.path.join(os.getcwd(), "private_key.pem")
+        self.VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20")
+        self.VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
 
 settings = Settings()

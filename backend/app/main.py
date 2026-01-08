@@ -56,4 +56,5 @@ def on_startup():
 if __name__ == "__main__":
     import uvicorn
     # Run the app
+    # Trigger reload
     uvicorn.run("backend.app.main:app", host="127.0.0.1", port=8000, reload=True)
