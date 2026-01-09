@@ -4,8 +4,8 @@ class Settings:
     PROJECT_NAME = os.getenv("PROJECT_NAME", "Insta-Pantry")
     PROJECT_VERSION = os.getenv("PROJECT_VERSION", "1.0.0")
 
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_b5nFf6GNiTvJ@ep-cool-smoke-advsyud7-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require")
-    SECRET_KEY = os.getenv("SECRET_KEY",'parthiv283')
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    SECRET_KEY = os.getenv("SECRET_KEY")
     ALGORITHM = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES = int(
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
@@ -18,7 +18,7 @@ class Settings:
         if self.ENV == "local":
             self.DATABASE_URL = "sqlite:///./pantry.db"
         else:
-            self.DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_b5nFf6GNiTvJ@ep-cool-smoke-advsyud7-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require")
+            self.DATABASE_URL = os.getenv("DATABASE_URL")
 
         # 2. VAPID Keys
         self.VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY") 
