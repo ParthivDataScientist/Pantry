@@ -1,10 +1,22 @@
 function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
+    if (!base64String) {
+        throw new Error("Invalid VAPID key: Key is empty");
+    }
 
-    const rawData = window.atob(base64);
+    // Clean the string: remove PEM headers/footers, newlines/whitespace, and existing padding
+    const base64 = base64String
+        .replace(/-----BEGIN PUBLIC KEY-----/g, '')
+        .replace(/-----END PUBLIC KEY-----/g, '')
+        .replace(/\s/g, '')
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+        .replace(/=/g, ''); // Remove existing padding to recalculate perfectly
+
+    // Add padding if needed
+    const padding = '='.repeat((4 - base64.length % 4) % 4);
+    const base64Padded = base64 + padding;
+
+    const rawData = window.atob(base64Padded);
     const outputArray = new Uint8Array(rawData.length);
 
     for (let i = 0; i < rawData.length; ++i) {
