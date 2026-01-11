@@ -94,7 +94,8 @@ def create_order(order_in: OrderCreate, db: Session = Depends(get_db), current_u
     db.refresh(db_order)
     
     # Notify pantry managers
-    notify_pantry_manager(db, db_order)
+    from backend.app.core.notifications import notify_pantry_managers
+    notify_pantry_managers(db, db_order)
     
     return db_order
 
@@ -150,44 +151,5 @@ def get_vapid_public_key():
     from backend.app.core.config import settings
     return {"public_key": settings.VAPID_PUBLIC_KEY}
 
-def notify_pantry_manager(db: Session, order_details: OrderModel):
-    from backend.app.core.config import settings
-    from backend.app.models.push_subscription import PushSubscription
-    
-    try:
-        from pywebpush import webpush, WebPushException
-    except ImportError:
-        print("pywebpush not installed. Skipping notification.")
-        return
 
-    # Get all pantry managers
-    pantry_users = db.query(User).filter(User.role == "pantry").all()
-    
-    for user in pantry_users:
-        for sub in user.push_subscriptions:
-            try:
-                webpush(
-                    subscription_info={
-                        "endpoint": sub.endpoint,
-                        "keys": {
-                            "p256dh": sub.p256dh,
-                            "auth": sub.auth
-                        }
-                    },
-                    data=json.dumps({
-                        "title": "New Order!",
-                        "body": f"Order #{order_details.id} from {order_details.employee_id}",
-                        "url": "/pantry"
-                    }),
-                    vapid_private_key=settings.VAPID_PRIVATE_KEY,
-                    vapid_claims={"sub": settings.VAPID_CLAIMS_EMAIL}
-                )
-            except WebPushException as ex:
-                if ex.response and ex.response.status_code == 410:
-                    # Subscription expired
-                    db.delete(sub)
-                    db.commit()
-                print("Push failed", ex)
-            except Exception as e:
-                print(f"Error sending push: {e}")
 
