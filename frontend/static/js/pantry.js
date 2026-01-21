@@ -141,7 +141,10 @@ function renderOrders(orders) {
                         <li class="flex justify-between items-center text-lg border-b border-gray-100 last:border-0 py-2">
                             <div class="flex items-center">
                                 ${i.image_url ? `<img src="${i.image_url}" class="w-12 h-12 rounded object-cover mr-3 border border-gray-200">` : ''}
-                                <span>${i.name}</span>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-gray-800">${i.name_hindi || i.name}</span>
+                                    ${i.name_hindi ? `<span class="text-xs text-gray-400">${i.name}</span>` : ''}
+                                </div>
                             </div>
                             <span class="font-bold bg-gray-200 px-2 rounded">x${i.quantity}</span>
                         </li>

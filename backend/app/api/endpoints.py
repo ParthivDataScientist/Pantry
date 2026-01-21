@@ -113,7 +113,25 @@ def get_pantry_orders(db: Session = Depends(get_db), current_user: User = Depend
     if current_user.role != "pantry":
         raise HTTPException(status_code=403, detail="Not authorized")
     
-    return db.query(OrderModel).filter(OrderModel.status == "Pending").all()
+    orders = db.query(OrderModel).filter(OrderModel.status == "Pending").all()
+    
+    # Enrich orders with latest product info (image, hindi name)
+    for order in orders:
+        try:
+            items = json.loads(order.items)
+            enriched = []
+            for item in items:
+                # Find product by name to get latest details
+                product = db.query(ProductModel).filter(ProductModel.name == item['name']).first()
+                if product:
+                    item['image_url'] = product.image_url
+                    item['name_hindi'] = product.name_hindi
+                enriched.append(item)
+            order.items = json.dumps(enriched)
+        except Exception:
+            pass # Keep original items if parse fails
+            
+    return orders
 
 @router.patch("/order/{order_id}/done")
 def mark_order_done(order_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

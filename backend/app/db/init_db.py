@@ -35,25 +35,25 @@ def init_db(db: Session):
 
     # Check if products exist
     products = [
-        {"name": "Water bottle", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=400&fit=crop"},
-        {"name": "Glass of water", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=400&fit=crop"},
-        {"name": "Tea", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&h=400&fit=crop"},
-        {"name": "Coffee", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop"},
-        {"name": "Black tea", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&h=400&fit=crop"},
-        {"name": "Coffee without Sugar", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=400&fit=crop"},
-        {"name": "Cold drink", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=400&h=400&fit=crop"},
-        {"name": "Small plate", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=400&h=400&fit=crop"},
-        {"name": "Big plate", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1686580091125-a64b744bba4c?w=400&h=400&fit=crop"},
-        {"name": "Small bowl", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=400&fit=crop"},
-        {"name": "Spoon", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1619367300933-376d8c5cd5f9?w=400&h=400&fit=crop"},
-        {"name": "Fork", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1569702824812-351205c9cde5?w=400&h=400&fit=crop"},
-        {"name": "Salt", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1634612831148-03a8550e1d52?w=400&h=400&fit=crop"},
-        {"name": "Sugar", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1610219171189-286769cc9b20?w=400&h=400&fit=crop"},
-        {"name": "Lunch", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop"},
-        {"name": "Vada pav", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1750767396969-f37060ebe07d?w=400&h=400&fit=crop"},
-        {"name": "Samosa", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=400&fit=crop"},
-        {"name": "Breakfast", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=400&fit=crop"},
-        {"name": "Other", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=400&fit=crop"},
+        {"name": "Water bottle", "name_hindi": "पानी की बोतल", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=400&fit=crop"},
+        {"name": "Glass of water", "name_hindi": "पानी का गिलास", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=400&fit=crop"},
+        {"name": "Tea", "name_hindi": "चाय", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=400&h=400&fit=crop"},
+        {"name": "Black tea", "name_hindi": "काली चाय", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&h=400&fit=crop"},
+        {"name": "Coffee", "name_hindi": "कॉफ़ी", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop"},
+        {"name": "Coffee without Sugar", "name_hindi": "बिना चीनी की कॉफ़ी", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=400&fit=crop"},
+        {"name": "Cold drink", "name_hindi": "कोल्ड ड्रिंक", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=400&h=400&fit=crop"},
+        {"name": "Small plate", "name_hindi": "छोटी प्लेट", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=400&h=400&fit=crop"},
+        {"name": "Big plate", "name_hindi": "बड़ी प्लेट", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1686580091125-a64b744bba4c?w=400&h=400&fit=crop"},
+        {"name": "Small bowl", "name_hindi": "छोटी कटोरी", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&h=400&fit=crop"},
+        {"name": "Spoon", "name_hindi": "चम्मच", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1619367300933-376d8c5cd5f9?w=400&h=400&fit=crop"},
+        {"name": "Fork", "name_hindi": "कांटा", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1569702824812-351205c9cde5?w=400&h=400&fit=crop"},
+        {"name": "Salt", "name_hindi": "नमक", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1634612831148-03a8550e1d52?w=400&h=400&fit=crop"},
+        {"name": "Sugar", "name_hindi": "चीनी", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1610219171189-286769cc9b20?w=400&h=400&fit=crop"},
+        {"name": "Lunch", "name_hindi": "दोपहर का भोजन", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop"},
+        {"name": "Vada pav", "name_hindi": "वड़ा पाव", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1750767396969-f37060ebe07d?w=400&h=400&fit=crop"},
+        {"name": "Samosa", "name_hindi": "समोसा", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=400&fit=crop"},
+        {"name": "Breakfast", "name_hindi": "नाश्ता", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&h=400&fit=crop"},
+        {"name": "Other", "name_hindi": "अन्य", "price": 0.0, "image_url": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=400&fit=crop"},
     ]
     
     for prod_data in products:
@@ -61,6 +61,10 @@ def init_db(db: Session):
         if not product:
             product = Product(**prod_data)
             db.add(product)
+        else:
+            # Update existing if needed
+            product.name_hindi = prod_data.get("name_hindi")
+            product.image_url = prod_data.get("image_url")
 
     db.commit()
 
