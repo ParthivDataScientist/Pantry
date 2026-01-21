@@ -35,10 +35,6 @@
     <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
         <h1 class="text-3xl font-bold text-yellow-500">KITCHEN DISPLAY</h1>
         <div class="flex items-center gap-4">
-            <button id="sound-toggle" onclick="playBellSound()"
-                class="bg-red-500 hover:opacity-80 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all">
-                🔕 Sound Off (Click to Enable)
-            </button>
             <div class="test-sm text-gray-400 font-mono" id="clock">00:00:00</div>
         </div>
     </header>
@@ -48,12 +44,7 @@
     </div>
 
     <!-- Push Notification Subscription Button -->
-    <div class="fixed bottom-4 right-4 z-50">
-        <button onclick="subscribeToPush()"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
-            🔔 Enable Notifications
-        </button>
-    </div>
+
 
     <script src="/static/js/pantry.js"></script>
     <script src="/static/js/push_client.js"></script>
