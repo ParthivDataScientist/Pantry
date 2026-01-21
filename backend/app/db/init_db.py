@@ -10,6 +10,25 @@ from backend.app.core.security import get_password_hash
 def init_db(db: Session):
     # Create tables
     Base.metadata.create_all(bind=engine)
+    
+    # Auto-migration: Check if name_hindi exists, if not add it
+    # This is for production where we can't easily run manual migration scripts
+    from sqlalchemy import text
+    try:
+        db.execute(text("SELECT name_hindi FROM products LIMIT 1"))
+    except Exception:
+        db.rollback()
+        try:
+            # Postgres syntax (works for SQLite too usually, but safe to try)
+            # SQLite doesn't support IF NOT EXISTS in ADD COLUMN in all versions, 
+            # but we are in the exception block so we know it doesn't exist.
+            print("Migrating database: Adding name_hindi column...")
+            db.execute(text("ALTER TABLE products ADD COLUMN name_hindi VARCHAR"))
+            db.commit()
+            print("Migration successful.")
+        except Exception as e:
+            print(f"Migration failed: {e}")
+            db.rollback()
 
     # Check if pantry user exists
     pantry_user = db.query(User).filter(User.username == "pantry_admin").first()
