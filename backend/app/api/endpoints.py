@@ -81,7 +81,16 @@ def create_order(order_in: OrderCreate, db: Session = Depends(get_db), current_u
     if current_user.role != "employee":
          raise HTTPException(status_code=403, detail="Only employees can place orders")
 
-    item_str = json.dumps([item.dict() for item in order_in.items])
+    # Enrich items with image_url from database
+    enriched_items = []
+    for item in order_in.items:
+        product = db.query(ProductModel).filter(ProductModel.id == item.product_id).first()
+        item_dict = item.dict()
+        if product and product.image_url:
+            item_dict['image_url'] = product.image_url
+        enriched_items.append(item_dict)
+
+    item_str = json.dumps(enriched_items)
     
     db_order = OrderModel(
         employee_id=current_user.username,

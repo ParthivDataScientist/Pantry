@@ -1,5 +1,6 @@
 
 let lastKnownOrderIds = new Set();
+let alertedOrderIds = new Set();
 let audioContext = null;
 
 function initAudio() {
@@ -8,12 +9,6 @@ function initAudio() {
     }
     if (audioContext.state === 'suspended') {
         audioContext.resume();
-    }
-    const soundBtn = document.getElementById('sound-toggle');
-    if (soundBtn) {
-        soundBtn.innerHTML = '🔔 Sound On';
-        soundBtn.classList.remove('bg-red-500');
-        soundBtn.classList.add('bg-green-500');
     }
 }
 
@@ -93,6 +88,23 @@ async function fetchOrders() {
             playBellSound();
         }
 
+        // Check for late orders (> 5 mins)
+        const now = new Date();
+        orders.forEach(o => {
+            if (o.timestamp) {
+                const orderTime = new Date(o.timestamp);
+                const diffMs = now - orderTime;
+                const diffMins = diffMs / 60000;
+
+                // If late and hasn't alerted yet
+                if (diffMins > 5 && !alertedOrderIds.has(o.id)) {
+                    console.log(`Order ${o.id} is late (> 5m)`);
+                    playBellSound();
+                    alertedOrderIds.add(o.id);
+                }
+            }
+        });
+
         lastKnownOrderIds = currentIds;
         renderOrders(orders);
     } catch (e) {
@@ -126,8 +138,11 @@ function renderOrders(orders) {
                 </div>
                 <ul class="space-y-2 mb-4">
                     ${items.map(i => `
-                        <li class="flex justify-between items-center text-lg">
-                            <span>${i.name}</span>
+                        <li class="flex justify-between items-center text-lg border-b border-gray-100 last:border-0 py-2">
+                            <div class="flex items-center">
+                                ${i.image_url ? `<img src="${i.image_url}" class="w-12 h-12 rounded object-cover mr-3 border border-gray-200">` : ''}
+                                <span>${i.name}</span>
+                            </div>
                             <span class="font-bold bg-gray-200 px-2 rounded">x${i.quantity}</span>
                         </li>
                     `).join('')}

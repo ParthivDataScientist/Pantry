@@ -8,6 +8,7 @@ class OrderItem(BaseModel):
     quantity: int
     name: str
     price: float
+    image_url: str = None
 
 class OrderCreate(BaseModel):
     employee: str
