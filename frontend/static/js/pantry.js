@@ -2,6 +2,7 @@
 let lastKnownOrderIds = new Set();
 let alertedOrderIds = new Set();
 let audioContext = null;
+let isInitialized = false;
 
 function initAudio() {
     if (!audioContext) {
@@ -56,7 +57,7 @@ function playBellSound() {
 function speakOrder(order) {
     try {
         const items = JSON.parse(order.items);
-        const itemStrings = items.map(i => `${i.quantity} ${i.name}`);
+        const itemStrings = items.map(i => `${i.quantity} ${i.name_hindi || i.name}`);
         const text = `New order from ${order.employee_id}. ${itemStrings.join(', ')}.`;
         
         console.log("Preparing to speak:", text);
@@ -95,20 +96,32 @@ function speakOrder(order) {
     }
 }
 
-function testVoice() {
+function startKitchen() {
     initAudio(); // Unblock audio context
-    const testOrder = {
-        employee_id: "Test",
-        items: JSON.stringify([{ quantity: 1, name: "Samosa" }])
-    };
-    speakOrder(testOrder);
-    alert("Triggered speech test. If you don't hear anything, check your volume or browser permissions.");
+    document.getElementById('start-overlay').style.display = 'none';
+    
+    // Test speak to confirm initialization
+    const utterance = new SpeechSynthesisUtterance("Kitchen system ready. Voice notifications enabled.");
+    const voices = window.speechSynthesis.getVoices();
+    const indianVoice = voices.find(v => v.lang === 'en-IN' || v.lang === 'hi-IN') || voices[0];
+    if (indianVoice) utterance.voice = indianVoice;
+    window.speechSynthesis.speak(utterance);
+    
+    console.log("Kitchen session started and audio unblocked.");
 }
 
 // Ensure voices are loaded
 window.speechSynthesis.onvoiceschanged = () => {
     console.log("Voices loaded:", window.speechSynthesis.getVoices().length);
 };
+
+// Global click to ensure audio is unblocked if overlay is missed
+document.addEventListener('click', () => {
+    const overlay = document.getElementById('start-overlay');
+    if (overlay && overlay.style.display !== 'none') {
+        startKitchen();
+    }
+}, { once: true });
 
 const token = localStorage.getItem('token');
 if (!token) window.location.href = '/';
@@ -133,7 +146,7 @@ async function fetchOrders() {
         let newOrders = [];
         const currentIds = new Set(orders.map(o => o.id));
 
-        if (lastKnownOrderIds.size > 0) { // Don't alert on first load if orders already exist
+        if (isInitialized) {
             orders.forEach(o => {
                 if (!lastKnownOrderIds.has(o.id)) {
                     newOrders.push(o);
@@ -145,6 +158,8 @@ async function fetchOrders() {
             playBellSound();
             newOrders.forEach(o => speakOrder(o));
         }
+
+        isInitialized = true;
 
         // Check for late orders (> 5 mins)
         const now = new Date();
