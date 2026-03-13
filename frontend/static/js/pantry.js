@@ -53,6 +53,41 @@ function playBellSound() {
     }
 }
 
+function speakOrder(order) {
+    try {
+        const items = JSON.parse(order.items);
+        const itemStrings = items.map(i => `${i.quantity} ${i.name}`);
+        const text = `New order from ${order.employee_id}. ${itemStrings.join(', ')}.`;
+        
+        const speak = () => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            
+            // Prioritize Indian English accent
+            const indianVoice = voices.find(v => v.lang === 'en-IN' || v.lang === 'hi-IN') || 
+                               voices.find(v => v.lang.includes('IN')) ||
+                               voices.find(v => v.lang.startsWith('en-GB')) ||
+                               voices[0];
+            
+            if (indianVoice) {
+                utterance.voice = indianVoice;
+            }
+            
+            utterance.rate = 0.85; // Slightly slower for better clarity
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        };
+
+        // Speak twice
+        speak();
+        speak();
+        
+        console.log("Spoken order:", text);
+    } catch (e) {
+        console.error("Speech synthesis failed:", e);
+    }
+}
+
 const token = localStorage.getItem('token');
 if (!token) window.location.href = '/';
 
@@ -72,20 +107,21 @@ async function fetchOrders() {
         }
         const orders = await response.json();
 
-        // Detect new orders for sound
-        let hasNewOrder = false;
+        // Detect new orders for sound and speech
+        let newOrders = [];
         const currentIds = new Set(orders.map(o => o.id));
 
-        if (lastKnownOrderIds.size > 0) { // Don't ring on first load if orders already exist
+        if (lastKnownOrderIds.size > 0) { // Don't alert on first load if orders already exist
             orders.forEach(o => {
                 if (!lastKnownOrderIds.has(o.id)) {
-                    hasNewOrder = true;
+                    newOrders.push(o);
                 }
             });
         }
 
-        if (hasNewOrder) {
+        if (newOrders.length > 0) {
             playBellSound();
+            newOrders.forEach(o => speakOrder(o));
         }
 
         // Check for late orders (> 5 mins)
