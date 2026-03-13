@@ -12,21 +12,19 @@ class Settings:
     )
 
     def __init__(self):
-        self.ENV = os.getenv("VERCEL_ENV") or os.getenv("ENV", "local")
-        
         # 1. Database URL
-        if self.ENV == "local":
-            self.DATABASE_URL = "sqlite:///./pantry.db"
-        else:
-            self.DATABASE_URL = os.getenv("DATABASE_URL")
+        self.DATABASE_URL = os.getenv("DATABASE_URL")
+        if not self.DATABASE_URL:
+            raise RuntimeError("DATABASE_URL is required in production")
 
         # 2. VAPID Keys
-        self.VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY") 
+        self.VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
         if not self.VAPID_PRIVATE_KEY:
-            # Fallback to local file only if ENV is local or key not provided
-            self.VAPID_PRIVATE_KEY = os.path.join(os.getcwd(), "private_key.pem")
+            raise RuntimeError("VAPID_PRIVATE_KEY is required in production")
             
-        self.VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY", "BJG_hQ9UMeD-mTM25uoB_LOvV4_0l1cpzrZ_l1HXXHG53LC4c3ssWUU2L0_SFvWNVxZwdCO3_4UWyEp_BbJTO20")
+        self.VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
+        if not self.VAPID_PUBLIC_KEY:
+            raise RuntimeError("VAPID_PUBLIC_KEY is required in production")
         
         # Sanitize PEM format if present (remove headers/footers/newlines)
         if "-----BEGIN PUBLIC KEY-----" in self.VAPID_PUBLIC_KEY:
@@ -63,18 +61,8 @@ class Settings:
 
         self.VAPID_CLAIMS_EMAIL = os.getenv("VAPID_CLAIMS_EMAIL", "mailto:admin@example.com")
 
-        # 3. Validation
-        if self.ENV != "local":
-            if not self.DATABASE_URL:
-                raise RuntimeError("DATABASE_URL is required in production")
-            if not self.SECRET_KEY:
-                raise RuntimeError("SECRET_KEY is required in production")
-            
-            # Check if VAPID key is likely a file path but we are in production
-            # (In prod, it should usually be the content, but if mapped as file that's okay too)
-            if "private_key.pem" in self.VAPID_PRIVATE_KEY:
-                # Log or warn if needed, but don't crash unless critical
-                pass
+        if not self.SECRET_KEY:
+            raise RuntimeError("SECRET_KEY is required in production")
 
 settings = Settings()
 
