@@ -113,7 +113,7 @@ function announceOrder(order) {
             .map(i => `${i.quantity} ${i.name_hindi || i.name}`)
             .join(', ');
 
-        let text = `New order from ${order.employee_id}. ${itemText}.`;
+        let text = `naya order from ${order.employee_id}. ${itemText}.`;
         if (order.notes) {
             text += ` Note: ${order.notes}.`;
         }
