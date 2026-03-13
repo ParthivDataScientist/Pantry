@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from backend.app.db.base import Base
+from backend.app.db.session import Base
 
 class PushSubscription(Base):
     __tablename__ = "push_subscriptions"
