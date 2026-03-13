@@ -59,8 +59,10 @@ function speakOrder(order) {
         const itemStrings = items.map(i => `${i.quantity} ${i.name}`);
         const text = `New order from ${order.employee_id}. ${itemStrings.join(', ')}.`;
         
-        const speak = () => {
-            const utterance = new SpeechSynthesisUtterance(text);
+        console.log("Preparing to speak:", text);
+
+        const speak = (content) => {
+            const utterance = new SpeechSynthesisUtterance(content);
             const voices = window.speechSynthesis.getVoices();
             
             // Prioritize Indian English accent
@@ -71,22 +73,42 @@ function speakOrder(order) {
             
             if (indianVoice) {
                 utterance.voice = indianVoice;
+                console.log("Using voice:", indianVoice.name);
+            } else {
+                console.warn("No suitable voice found, using default.");
             }
             
-            utterance.rate = 0.85; // Slightly slower for better clarity
+            utterance.rate = 0.85;
             utterance.pitch = 1.0;
             window.speechSynthesis.speak(utterance);
         };
 
-        // Speak twice
-        speak();
-        speak();
+        // Clear any existing speech
+        window.speechSynthesis.cancel();
         
-        console.log("Spoken order:", text);
+        // Speak twice with a small delay between them
+        speak(text);
+        setTimeout(() => speak(text), 100); // Small gap is usually enough for the queue
+        
     } catch (e) {
         console.error("Speech synthesis failed:", e);
     }
 }
+
+function testVoice() {
+    initAudio(); // Unblock audio context
+    const testOrder = {
+        employee_id: "Test",
+        items: JSON.stringify([{ quantity: 1, name: "Samosa" }])
+    };
+    speakOrder(testOrder);
+    alert("Triggered speech test. If you don't hear anything, check your volume or browser permissions.");
+}
+
+// Ensure voices are loaded
+window.speechSynthesis.onvoiceschanged = () => {
+    console.log("Voices loaded:", window.speechSynthesis.getVoices().length);
+};
 
 const token = localStorage.getItem('token');
 if (!token) window.location.href = '/';
