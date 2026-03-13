@@ -58,7 +58,11 @@ function speakOrder(order) {
     try {
         const items = JSON.parse(order.items);
         const itemStrings = items.map(i => `${i.quantity} ${i.name_hindi || i.name}`);
-        const text = `New order from ${order.employee_id}. ${itemStrings.join(', ')}.`;
+        let text = `New order from ${order.employee_id}. ${itemStrings.join(', ')}.`;
+        
+        if (order.notes) {
+            text += ` Note: ${order.notes}`;
+        }
         
         console.log("Preparing to speak:", text);
 
