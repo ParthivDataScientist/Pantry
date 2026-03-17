@@ -71,18 +71,24 @@ function playBellSound() {
 // ── Speech synthesis ──────────────────────────────────────────────────────────
 
 /**
- * Select the best available voice, preferring Indian English/Hindi accents.
- * @returns {SpeechSynthesisVoice|null}
+ * Select the best available voice, prioritizing high-quality Hindi or Indian English.
  */
 function getBestVoice() {
     const voices = window.speechSynthesis.getVoices();
-    return (
-        voices.find(v => v.lang === 'en-IN' || v.lang === 'hi-IN') ||
-        voices.find(v => v.lang.includes('IN')) ||
-        voices.find(v => v.lang.startsWith('en-GB')) ||
-        voices[0] ||
-        null
-    );
+    
+    // Priority 1: Hindi (hi-IN) - specifically for the Hindi text used in item names
+    const hindiVoice = voices.find(v => v.lang === 'hi-IN');
+    if (hindiVoice) return hindiVoice;
+
+    // Priority 2: Indian English (en-IN) - often sounds more natural with Hindi-mixed sentences
+    const indianEnglishVoice = voices.find(v => v.lang === 'en-IN');
+    if (indianEnglishVoice) return indianEnglishVoice;
+
+    // Priority 3: Fallback to any voice with "India" in the name (e.g., Google's localized voices)
+    const regionalVoice = voices.find(v => v.name.toLowerCase().includes('india'));
+    if (regionalVoice) return regionalVoice;
+
+    return voices[0] || null; // Final fallback to system default
 }
 
 /**
@@ -93,10 +99,18 @@ function getBestVoice() {
 function speak(text, onEnd) {
     const utterance = new SpeechSynthesisUtterance(text);
     const voice = getBestVoice();
-    if (voice) utterance.voice = voice;
-    utterance.rate  = 0.85;
+    
+    if (voice) {
+        utterance.voice = voice;
+        // If it's a Hindi voice, the lang should match the voice
+        utterance.lang = voice.lang; 
+    }
+    
+    utterance.rate = 0.9;  // Slightly slower for better clarity in kitchen environments
     utterance.pitch = 1.0;
     if (onEnd) utterance.onend = onEnd;
+    
+    window.speechSynthesis.cancel(); // Stop any current speech before starting new one
     window.speechSynthesis.speak(utterance);
 }
 
@@ -113,7 +127,7 @@ function announceOrder(order) {
             .map(i => `${i.quantity} ${i.name_hindi || i.name}`)
             .join(', ');
 
-        let text = `naya order from ${order.employee_id}. ${itemText}.`;
+        let text = `${order.employee_id} se naya order. ${itemText}.`;
         if (order.notes) {
             text += ` Note: ${order.notes}.`;
         }
@@ -145,8 +159,11 @@ document.addEventListener('click', () => {
     }
 }, { once: true });
 
-// Ensure voice list is populated asap (browsers load it lazily)
-window.speechSynthesis.onvoiceschanged = () => {};
+// This ensures the voice list is populated as soon as the browser has them ready
+window.speechSynthesis.onvoiceschanged = () => {
+    console.log("Voices updated:", window.speechSynthesis.getVoices().length);
+    getBestVoice(); 
+};
 
 // ── Clock ─────────────────────────────────────────────────────────────────────
 

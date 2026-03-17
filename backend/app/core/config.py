@@ -7,6 +7,11 @@ for local development so the server can start without any .env setup.
 
 import os
 import base64
+import logging
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
+
+logger = logging.getLogger(__name__)
 
 
 def _normalize_vapid_public_key(key: str) -> str:
@@ -46,6 +51,42 @@ def _normalize_vapid_public_key(key: str) -> str:
     return key
 
 
+def _normalize_vapid_private_key(key: str) -> str:
+    """
+    Ensure the VAPID private key is in a format pywebpush can handle.
+    If it's a file path, it returns it as-is.
+    If it's a PEM string, it extracts the raw 32-byte private key and
+    returns it as base64url-encoded string (no padding).
+    """
+    key = key.strip()
+    if not key:
+        return key
+
+    # If it's a file path, pywebpush handles it
+    if os.path.exists(key):
+        return key
+
+    # If it's a PEM string, parse it
+    if "-----BEGIN PRIVATE KEY-----" in key:
+        try:
+            priv_key = serialization.load_pem_private_key(
+                key.encode(),
+                password=None,
+                backend=default_backend()
+            )
+            # EC private keys have a 'private_value' which is 'd'
+            # We need the 32-byte representation for P-256
+            d_int = priv_key.private_numbers().private_value
+            raw_bytes = d_int.to_bytes(32, "big")
+            return base64.urlsafe_b64encode(raw_bytes).decode().rstrip("=")
+        except Exception as e:
+            logger.warning("Failed to parse VAPID_PRIVATE_KEY as PEM: %s", e)
+            # Fall back to returning as-is, maybe it's just raw base64
+            pass
+
+    return key
+
+
 class Settings:
     """Central application settings loaded from environment variables."""
 
@@ -79,7 +120,7 @@ class Settings:
         vapid_private = os.getenv("VAPID_PRIVATE_KEY", "")
         if not vapid_private:
             raise RuntimeError("VAPID_PRIVATE_KEY environment variable is required.")
-        self.VAPID_PRIVATE_KEY = vapid_private
+        self.VAPID_PRIVATE_KEY = _normalize_vapid_private_key(vapid_private)
 
         vapid_public = os.getenv("VAPID_PUBLIC_KEY", "")
         if not vapid_public:
