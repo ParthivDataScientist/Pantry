@@ -5,8 +5,26 @@
  * Redirects to login if no token is found.
  */
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+/** Retrieve token from localStorage OR from browser cookies */
+function getAuthToken() {
+    // Try localStorage first
+    const lToken = localStorage.getItem('token');
+    if (lToken) return lToken;
+
+    // Fallback: look in document.cookie (token=xxxxx;)
+    const name = 'token=';
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return null;
+}
+
 // ── Auth guard ────────────────────────────────────────────────────────────────
-const token = localStorage.getItem('token');
+const token = getAuthToken();
 if (!token) {
     window.location.href = '/';
 }
@@ -16,7 +34,9 @@ let products = [];
 /** @type {{ [productId: number]: { quantity: number, name: string } }} */
 let cart = {};
 
-// ── Product fetching ──────────────────────────────────────────────────────────
+/** Counter for consecutive authentication failures */
+let authFailCount = 0;
+
 async function fetchProducts() {
     try {
         const response = await fetch('/api/products', {
@@ -24,9 +44,16 @@ async function fetchProducts() {
         });
 
         if (response.status === 401) {
-            window.location.href = '/';
+            authFailCount++;
+            if (authFailCount >= 3) {
+                window.location.href = '/';
+                return;
+            }
+            // Retrying might be handled by manual refresh or subsequent calls
             return;
         }
+        
+        authFailCount = 0;
 
         products = await response.json();
         renderProducts();
@@ -217,6 +244,7 @@ function showOrderError(message) {
 // ── Logout ────────────────────────────────────────────────────────────────────
 document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('token');
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     window.location.href = '/';
 });
 

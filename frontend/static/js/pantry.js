@@ -6,8 +6,26 @@
  * Requires "START NOW" to be clicked first to unblock browser audio policy.
  */
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+/** Retrieve token from localStorage OR from browser cookies */
+function getAuthToken() {
+    // Try localStorage first
+    const lToken = localStorage.getItem('token');
+    if (lToken) return lToken;
+
+    // Fallback: look in document.cookie (token=xxxxx;)
+    const name = 'token=';
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return null;
+}
+
 // ── Auth guard ────────────────────────────────────────────────────────────────
-const token = localStorage.getItem('token');
+const token = getAuthToken();
 if (!token) {
     window.location.href = '/';
 }
@@ -174,6 +192,9 @@ setInterval(updateClock, 1000);
 
 // ── Order polling ─────────────────────────────────────────────────────────────
 
+/** Counter for consecutive authentication failures */
+let authFailCount = 0;
+
 async function fetchOrders() {
     try {
         const response = await fetch('/api/pantry/orders', {
@@ -181,9 +202,25 @@ async function fetchOrders() {
         });
 
         if (response.status === 401) {
-            window.location.href = '/';
+            authFailCount++;
+            console.error(`Auth failure #${authFailCount}`);
+            
+            // On TV browsers, we want to be extra careful before logging out.
+            // If it's a transient server issue, we don't want to kick the user.
+            // If it fails 3 times in a row, then we redirect.
+            if (authFailCount >= 3) {
+                localStorage.removeItem('token');
+                document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                window.location.href = '/';
+                return;
+            }
+            
+            // Don't process this failed request, wait for next poll
             return;
         }
+
+        // Success: reset failure counter
+        authFailCount = 0;
 
         const orders = await response.json();
         processNewOrders(orders);
@@ -193,7 +230,8 @@ async function fetchOrders() {
         isInitialLoad = false;
 
         renderOrders(orders);
-    } catch {
+    } catch (e) {
+        console.warn('Network error or server down, retrying:', e);
         // Silently ignore transient network errors — the next poll will retry
     }
 }

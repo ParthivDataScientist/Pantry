@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('token', data.access_token);
+                setAuth(data.access_token);
                 window.location.href = data.redirect_url;
             } else {
                 showError('Invalid username or password.');
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('token', data.access_token);
+                setAuth(data.access_token);
                 window.location.href = data.redirect_url;
             } else {
                 const errData = await response.json();
@@ -86,6 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── Helpers ───────────────────────────────────────────────────────────
+    function setAuth(token) {
+        // Save to localStorage (stays across restarts)
+        localStorage.setItem('token', token);
+        
+        // Save to Cookie (more robust on some TV browsers/Chromium flavors)
+        // 30 days expiry (matched with backend ACCESS_TOKEN_EXPIRE_MINUTES)
+        const expiry = 60 * 60 * 24 * 30;
+        document.cookie = `token=${token}; path=/; max-age=${expiry}; SameSite=Lax`;
+    }
+
     function showError(message) {
         errorMsg.textContent = message;
         errorMsg.classList.remove('hidden');
