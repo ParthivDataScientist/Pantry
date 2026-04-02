@@ -165,9 +165,23 @@ function announceOrder(order) {
  */
 function startKitchen() {
     initAudio();
+    localStorage.setItem('kitchen_started', 'true'); // Persist "started" state
     document.getElementById('start-overlay').style.display = 'none';
     speak('Kitchen system ready. Voice notifications enabled.');
 }
+
+// Check if kitchen was previously started to auto-hide overlay
+window.addEventListener('DOMContentLoaded', () => {
+    if (localStorage.getItem('kitchen_started') === 'true') {
+        console.log('[Init] Kitchen previously started. Auto-hiding overlay.');
+        document.getElementById('start-overlay').style.display = 'none';
+        
+        // Note: Browsers will likely still block audio until the FIRST user interaction 
+        // on the new page. But at least the dashboard is visible immediately.
+        // We'll try to resume audio context if possible.
+        initAudio();
+    }
+});
 
 // Tap anywhere on the overlay to start (in case the button is missed)
 document.addEventListener('click', () => {
@@ -353,6 +367,35 @@ async function markOrderDone(orderId) {
         console.error(`Network error marking order #${orderId} as done:`, e);
     }
 }
+
+// ── Keep-Alive (Prevent Screen Saver) ─────────────────────────────────────────
+
+/**
+ * Periodically simulates activity by performing a micro-scroll.
+ * 1px scroll is invisible but often enough to trick TV screen savers.
+ */
+function simulateActivity() {
+    console.log('[Keep-Alive] Simulating micro-activity (scroll) to prevent screen saver...');
+    window.scrollBy(0, 1);
+    window.scrollBy(0, -1);
+}
+
+/**
+ * Performs a full page refresh every few minutes as requested.
+ * We ensure session persistence by storing the 'started' state.
+ */
+function scheduledRefresh() {
+    console.log('[Keep-Alive] Performing scheduled 5-minute refresh...');
+    // We already save 'kitchen_started' in startKitchen(), so it will 
+    // auto-hide the overlay on reload.
+    window.location.reload();
+}
+
+// Trigger micro-activity every 2 minutes
+setInterval(simulateActivity, 2 * 60 * 1000);
+
+// Trigger full refresh every 5 minutes (Requirement #1)
+setInterval(scheduledRefresh, 5 * 60 * 1000);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 setInterval(fetchOrders, 5000);
