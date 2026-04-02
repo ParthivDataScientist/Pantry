@@ -60,17 +60,17 @@ app.include_router(router, prefix="/api")
 # ── Page routes ───────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html", {"request": request})
 
 
 @app.get("/order", response_class=HTMLResponse)
 async def order_page(request: Request):
-    return templates.TemplateResponse("order.html", {"request": request})
+    return templates.TemplateResponse(request, "order.html", {"request": request})
 
 
 @app.get("/pantry", response_class=HTMLResponse)
 async def pantry_page(request: Request):
-    return templates.TemplateResponse("pantry.html", {"request": request})
+    return templates.TemplateResponse(request, "pantry.html", {"request": request})
 
 
 @app.get("/sw.js")
