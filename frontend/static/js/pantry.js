@@ -1,6 +1,93 @@
 
 let lastKnownOrderIds = new Set();
 let audioContext = null;
+let wakeLockSentinel = null;
+let wakeLockRetryTimer = null;
+let wakeLockUnsupportedLogged = false;
+
+const ORDER_POLL_MS = 5000;
+const WAKE_LOCK_RETRY_MS = 15000;
+const WAKE_LOCK_HEARTBEAT_MS = 30000;
+
+function updateWakeLockStatus(message, isError = false) {
+    const statusEl = document.getElementById('wake-lock-status');
+    if (!statusEl) return;
+
+    statusEl.textContent = `Screen Awake: ${message}`;
+    statusEl.classList.toggle('border-red-500', isError);
+    statusEl.classList.toggle('text-red-300', isError);
+    statusEl.classList.toggle('border-gray-600', !isError);
+    statusEl.classList.toggle('text-gray-300', !isError);
+}
+
+function scheduleWakeLockRetry() {
+    if (wakeLockRetryTimer) return;
+    wakeLockRetryTimer = setTimeout(() => {
+        wakeLockRetryTimer = null;
+        ensureScreenWakeLock('retry');
+    }, WAKE_LOCK_RETRY_MS);
+}
+
+async function ensureScreenWakeLock(reason = 'background') {
+    if (!('wakeLock' in navigator)) {
+        if (!wakeLockUnsupportedLogged) {
+            wakeLockUnsupportedLogged = true;
+            updateWakeLockStatus('Unsupported');
+            console.warn('Screen Wake Lock API is not supported on this browser.');
+        }
+        return false;
+    }
+
+    if (document.visibilityState !== 'visible') {
+        updateWakeLockStatus('Paused');
+        return false;
+    }
+
+    if (wakeLockSentinel && !wakeLockSentinel.released) {
+        updateWakeLockStatus('Active');
+        return true;
+    }
+
+    try {
+        wakeLockSentinel = await navigator.wakeLock.request('screen');
+        wakeLockSentinel.addEventListener('release', () => {
+            wakeLockSentinel = null;
+            updateWakeLockStatus('Released');
+            scheduleWakeLockRetry();
+        });
+        updateWakeLockStatus('Active');
+        console.log(`Wake lock acquired (${reason}).`);
+        return true;
+    } catch (error) {
+        updateWakeLockStatus('Retrying', true);
+        console.warn(`Wake lock request failed (${reason}).`, error);
+        scheduleWakeLockRetry();
+        return false;
+    }
+}
+
+function setupWakeLockHandlers() {
+    ensureScreenWakeLock('startup');
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            ensureScreenWakeLock('visibility');
+            fetchOrders();
+        } else {
+            updateWakeLockStatus('Paused');
+        }
+    });
+
+    ['click', 'touchstart', 'keydown'].forEach(eventName => {
+        document.addEventListener(eventName, () => {
+            ensureScreenWakeLock('interaction');
+        }, { passive: true });
+    });
+
+    setInterval(() => {
+        ensureScreenWakeLock('heartbeat');
+    }, WAKE_LOCK_HEARTBEAT_MS);
+}
 
 function initAudio() {
     if (!audioContext) {
@@ -91,6 +178,7 @@ async function fetchOrders() {
 
         if (hasNewOrder) {
             playBellSound();
+            ensureScreenWakeLock('new-order');
         }
 
         lastKnownOrderIds = currentIds;
@@ -158,6 +246,8 @@ async function markDone(id) {
     }
 }
 
+setupWakeLockHandlers();
+
 // Poll every 5 seconds
-setInterval(fetchOrders, 5000);
+setInterval(fetchOrders, ORDER_POLL_MS);
 fetchOrders();
